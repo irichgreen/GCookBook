@@ -21,7 +21,7 @@ summary(mtcars)
 
 You can also embed plots, for example:
 
-```{r, echo=FALSE}
+```{r}
 plot(mtcars$wt, mtcars$mpg)
 qplot(mtcars$wt, mtcars$mpg)
 qplot(wt, mpg, data=mtcars)
