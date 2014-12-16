@@ -5,9 +5,7 @@ date: "Tuesday, December 16, 2014"
 output: html_document
 ---
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+필요 R 패키지
 
 ```{r}
 library(ggplot2)
@@ -15,17 +13,133 @@ library(gcookbook)
 library(xlsx)       #.xlsx data read
 library(gdata)      #.xls data read
 library(foreign)    # SPSS, SAS, MATLAB
-
-summary(mtcars)
 ```
 
-You can also embed plots, for example:
+2.1 산점도 그리기
 
 ```{r}
 plot(mtcars$wt, mtcars$mpg)
 qplot(mtcars$wt, mtcars$mpg)
 qplot(wt, mpg, data=mtcars)
 ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point()
+```
+
+2.2 선 그래프 그리기
+
+```{r}
+plot(pressure$temperature, pressure$pressure, type="l")
+        
+plot(pressure$temperature, pressure$pressure, type="l")
+points(pressure$temperature, pressure$pressure)
+
+lines(pressure$temperature, pressure$pressure/2, col="red")
+points(pressure$temperature, pressure$pressure/2, col="red")
+
+qplot(pressure$temperature, pressure$pressure, geom="line")
+qplot(temperature, pressure, data=pressure, geom="line")
+ggplot(pressure, aes(x=temperature, y=pressure)) + geom_line()
+
+# Lines and points together
+qplot(temperature, pressure, data=pressure, geom=c("line", "point"))
+# Equivalent to:
+ggplot(pressure, aes(x=temperature, y=pressure)) + geom_line() + geom_point()
+
+```
+
+2.3 막대 그래프 그리기
+
+```{r}
+barplot(BOD$demand, names.arg=BOD$Time)
+
+table(mtcars$cyl)
+
+# Generate a table of counts
+barplot(table(mtcars$cyl))
+
+qplot(BOD$Time, BOD$demand, geom="bar", stat="identity")
+
+# Convert the x variable to a factor, so that it is treated as discrete
+qplot(factor(BOD$Time), BOD$demand, geom="bar", stat="identity")
+    
+# cyl is continuous here
+qplot(mtcars$cyl)
+
+# Treat cyl as discrete
+qplot(factor(mtcars$cyl))
+    
+# Bar graph of values. This uses the BOD data frame, with the 
+#"Time" column for x values and the "demand" column for y values.
+qplot(Time, demand, data=BOD, geom="bar", stat="identity")
+# This is equivalent to:
+ggplot(BOD, aes(x=Time, y=demand)) + geom_bar(stat="identity")
+
+
+# Bar graph of counts
+qplot(factor(cyl), data=mtcars)
+# This is equivalent to:
+ggplot(mtcars, aes(x=factor(cyl))) + geom_bar()
+
+```
+
+2.4 히스토그램 생성하기
+
+```{r}
+hist(mtcars$mpg)
+
+# Specify approximate number of bins with breaks
+hist(mtcars$mpg, breaks=10)  
+qplot(mtcars$mpg)
+qplot(mpg, data=mtcars, binwidth=4)
+
+# This is equivalent to:
+ggplot(mtcars, aes(x=mpg)) + geom_histogram(binwidth=4)
+
+```
+
+2.5 박스 플롯 생성하기
+
+```{r}
+plot(ToothGrowth$supp, ToothGrowth$len)
+
+# Formula syntax
+boxplot(len ~ supp, data = ToothGrowth)
+
+# Put interaction of two variables on x-axis
+boxplot(len ~ supp + dose, data = ToothGrowth)
+qplot(ToothGrowth$supp, ToothGrowth$len, geom="boxplot")
+qplot(supp, len, data=ToothGrowth, geom="boxplot")
+
+# This is equivalent to:
+ggplot(ToothGrowth, aes(x=supp, y=len)) + geom_boxplot()
+
+# Using three separate vectors
+qplot(interaction(ToothGrowth$supp, ToothGrowth$dose), ToothGrowth$len, geom="boxplot")
+
+# Alternatively, get the columns from the data frame
+qplot(interaction(supp, dose), len, data=ToothGrowth, geom="boxplot")
+
+# This is equivalent to:
+ggplot(ToothGrowth, aes(x=interaction(supp, dose), y=len)) + geom_boxplot()
+
+```
+
+2.6 함수 곡선 그리기
+
+```{r}
+curve(x^3 - 5*x, from=-4, to=4)
+
+# 사용자 정의 함수를 그래프로 그림
+myfun <- function(xvar) {
+    1/(1 + exp(-xvar + 10))
+}
+
+curve(myfun(x), from=0, to=20)
+# 곡선 추가
+curve(1 - myfun(x), add = TRUE, col = "red")
+
+qplot(c(0, 20), fun=myfun, stat="function", geom="line")
+ggplot(data.frame(x=c(0, 20)), aes(x=x)) + stat_function(fun=myfun, geom="line")
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
